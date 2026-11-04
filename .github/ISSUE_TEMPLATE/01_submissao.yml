@@ -1,29 +1,26 @@
-name: 📝 Nova Submissão de Software (Submission)
+name: 📝 Nova Submissão de Software (JOSS-style Pre-Review)
 description: Submeta seu software de código aberto e artigo para revisão por pares na RBCS.
-title: "[Submissão]: "
-labels: ["pre-review", "needs-editor"]
+title: "[PRE REVIEW]: "
+labels: ["pre-review"]
 body:
   - type: markdown
     attributes:
       value: |
         Obrigado por submeter seu software à **Revista Brasileira de Computação e Software Científico (RBCS)**!
-        Por favor, preencha os campos abaixo com atenção. Antes de prosseguir, confirme que o seu repositório contém:
-        1. Código-fonte completo com licença de código aberto (aprovada pela OSI).
-        2. Arquivo `paper.md` e `paper.bib` na raiz ou no diretório `paper/`.
-        3. Instruções claras de instalação e suíte de testes funcionais.
+        Esta submissão iniciará a fase de **PRE-REVIEW** (triagem de escopo, auditoria automatizada do repositório e designação de editor/revisores).
 
   - type: input
     id: title
     attributes:
-      label: Título do Artigo / Software
-      placeholder: "Ex: PyBioPipeline: Um pacote Python para análise genômica comparativa"
+      label: Título do Artigo / Software Title
+      placeholder: "Ex: PyBioPipeline: A Python package for comparative genomics"
     validations:
       required: true
 
   - type: input
     id: repository
     attributes:
-      label: URL do Repositório no GitHub
+      label: URL do Repositório no GitHub / Repository URL
       placeholder: "https://github.com/usuario/repositorio"
     validations:
       required: true
@@ -31,16 +28,15 @@ body:
   - type: input
     id: version
     attributes:
-      label: Versão / Tag do Software Submetido
-      placeholder: "Ex: v1.0.0 ou commit SHA"
+      label: Versão ou Branch / Version or Git Branch
+      placeholder: "Ex: v1.0.0 ou main"
     validations:
       required: true
 
   - type: dropdown
     id: track
     attributes:
-      label: Trilha Editorial Principal
-      description: Selecione a área mais adequada para a designação do editor especializado.
+      label: Trilha Editorial Principal / Editorial Track
       options:
         - "🧬 Bioinformática & Biologia Computacional (Genômica, Transcriptômica, Ômicas)"
         - "🏥 Computação Biomédica & Informática em Saúde (Imagens Médicas, Sinais, EHR)"
@@ -52,16 +48,15 @@ body:
   - type: input
     id: authors
     attributes:
-      label: Autores e Afiliações
-      description: Liste autores com GitHub handles (se aplicável) e links ORCID.
-      placeholder: "Nome do Autor (@github_handle, ORCID: 0000-0000-0000-0000, Universidade XYZ)"
+      label: Autores e Afiliações / Authors, Affiliations and ORCIDs
+      placeholder: "Jane Doe (@janedoe, ORCID: 0000-0000-0000-0000, Institution X)"
     validations:
       required: true
 
   - type: input
     id: license
     attributes:
-      label: Licença de Código Aberto (OSI-approved)
+      label: Licença de Código Aberto (OSI-approved) / Open Source License
       placeholder: "Ex: MIT, Apache-2.0, GPL-3.0, BSD-3-Clause"
     validations:
       required: true
@@ -69,8 +64,7 @@ body:
   - type: textarea
     id: summary
     attributes:
-      label: Resumo Curto e Declaração de Necessidade (Statement of Need)
-      description: Breve parágrafo explicando o propósito do software e o público científico que ele atende.
+      label: Resumo Curto e Declaração de Necessidade / Summary & Statement of Need
       placeholder: "PyBioPipeline é uma ferramenta desenvolvida para acelerar a identificação de variantes..."
     validations:
       required: true
@@ -78,13 +72,13 @@ body:
   - type: checkboxes
     id: terms
     attributes:
-      label: Declarações e Compromissos
+      label: Declarações e Compromissos / Commitments
       options:
         - label: "Confirmo que sou um dos autores ou mantenedores principais do software."
           required: true
         - label: "O repositório é público no GitHub e possui uma licença OSI explícita no arquivo LICENSE."
           required: true
-        - label: "O repositório contém os arquivos paper.md e paper.bib prontos para compilação."
+        - label: "O repositório contém os arquivos paper.md e paper.bib prontos para compilação via Inara."
           required: true
         - label: "O software possui documentação de instalação e testes que podem ser executados pelos revisores."
           required: true

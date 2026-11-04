@@ -1,0 +1,81 @@
+name: "Iniciar Revisão por Pares (JOSS Start Review)"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  start_review:
+    name: Transicionar de Pre-Review para Review
+    if: |
+      github.event.issue.state == 'open' &&
+      contains(github.event.issue.labels.*.name, 'pre-review') &&
+      (contains(github.event.comment.body, 'start review') ||
+       contains(github.event.comment.body, 'iniciar revisao') ||
+       contains(github.event.comment.body, '/start-review'))
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout Repositório Editorial
+        uses: actions/checkout@v4
+
+      - name: Criar Issue Formal de Revisão com Checklist
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const preIssue = context.payload.issue;
+            const commentBody = context.payload.comment.body;
+            
+            // Extrai revisores mencionados no issue ou no comando
+            const reviewers = [];
+            const reviewerMatches = commentBody.match(/@([a-zA-Z0-9_\-]+)/g) || [];
+            reviewerMatches.forEach(r => {
+              const handle = r.replace('@', '');
+              if (handle !== 'editorialbot' && handle !== 'rbcs-bot' && !reviewers.includes(handle)) {
+                reviewers.push(handle);
+              }
+            });
+
+            const r1 = reviewers[0] || 'revisor1';
+            const r2 = reviewers[1] || 'revisor2';
+
+            const cleanTitle = preIssue.title.replace(/\[PRE REVIEW\]:\s*/i, '').replace(/\[Submissão\]:\s*/i, '');
+            const newTitle = `[REVIEW]: ${cleanTitle}`;
+
+            // Lê o template oficial de checklist
+            const fs = require('fs');
+            let checklistTemplate = fs.readFileSync('.github/ISSUE_TEMPLATE/02_review_checklist.md', 'utf8');
+            // Remove frontmatter do template
+            checklistTemplate = checklistTemplate.replace(/^---[\s\S]*?---\n/, '');
+            
+            // Preenche metadados
+            checklistTemplate = checklistTemplate.replace(/@reviewer1/g, `@${r1}`);
+            checklistTemplate = checklistTemplate.replace(/@reviewer2/g, `@${r2}`);
+            checklistTemplate = checklistTemplate.replace(/<!-- @author -->/, `@${preIssue.user.login}`);
+
+            // Cria o novo issue de revisão
+            const newIssue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: newTitle,
+              body: `> **Pre-Review Original**: #${preIssue.number}\n\n` + checklistTemplate,
+              labels: ['review', 'in-review']
+            });
+
+            // Comenta no issue anterior e o fecha
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: preIssue.number,
+              body: `🚀 **Fase de Pre-Review Concluída!**\n\nO processo formal de revisão por pares foi iniciado no issue **#${newIssue.data.number}** ([Acessar Revisão](${newIssue.data.html_url})).\n\nRevisores convidados: @${r1}, @${r2}.`
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: preIssue.number,
+              state: 'closed'
+            });

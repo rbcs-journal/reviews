@@ -1,65 +1,91 @@
 ---
-name: 🔍 Checklist de Revisão por Pares (Reviewer Checklist)
-description: Template do processo de revisão por pares aberta da RBCS para ser preenchido pelos revisores.
-title: "[Revisão]: "
+name: 🔍 Checklist Oficial de Revisão por Pares (JOSS Official Criteria)
+description: Template do processo de revisão por pares aberta da RBCS 100% idêntico ao padrão oficial do JOSS.
+title: "[REVIEW]: "
 labels: ["review", "in-review"]
 ---
 
 # Processo Editorial e Revisão por Pares — RBCS
 **Revista Brasileira de Computação e Software Científico**
+*(Equivalente oficial aos critérios de revisão do Journal of Open Source Software - JOSS)*
 
-- **Artigo / Software**: <!-- Nome do Software -->
-- **Repositório**: <!-- URL do Repositório -->
-- **Versão sob Revisão**: <!-- Tag / Release -->
-- **Editor Responsável**: <!-- @editor -->
-- **Revisores Designados**: <!-- @revisor1, @revisor2 -->
-
----
-
-## 📋 Instruções aos Revisores
-A revisão por pares na RBCS é aberta, colaborativa e pública. O objetivo é assegurar o rigor científico, a facilidade de instalação e a reprodutibilidade do software.
-Marque as caixas de seleção (`[x]`) conforme for validando cada item. Utilize os comentários deste issue para dialogar com os autores e solicitar correções ou esclarecimentos.
+- **Submitting Author**: <!-- @author -->
+- **Repository URL**: <!-- https://github.com/org/repo -->
+- **Version / Commit**: <!-- v1.0.0 ou commit SHA -->
+- **Editor**: <!-- @editor -->
+- **Reviewers**: <!-- @reviewer1, @reviewer2 -->
 
 ---
 
-## Checklist de Avaliação — Revisor 1 (@username)
+## 📋 Reviewer 1 Checklist (@reviewer1)
 
-### 1. Licença & Repositório
-- [ ] **Licença Aberta**: O repositório contém um arquivo `LICENSE` com uma licença de código aberto reconhecida pela [OSI](https://opensource.org/licenses).
-- [ ] **Acesso ao Código**: O código-fonte está completo, versionado e disponível publicamente no GitHub.
-- [ ] **Versionamento**: O software possui uma tag de versão clara (ex: `v1.0.0`).
+### Conflict of Interest
+- [ ] **Conflict of Interest**: I confirm that I have no conflicts of interest with the authors of this submission.
 
-### 2. Documentação e Instalação
-- [ ] **Guia de Instalação**: Existem instruções claras e completas de instalação em um ambiente limpo (ex: via `pip`, `conda`, `docker`, `cargo`, etc.).
-- [ ] **Instalação Funcional**: O revisor conseguiu instalar o software com sucesso seguindo rigorosamente as instruções da documentação.
-- [ ] **Dependências**: Todas as dependências externas e versões mínimas requeridas estão especificadas.
-- [ ] **Exemplos de Uso**: Há um tutorial básico (*Quickstart*) ou exemplos reproduzíveis de uso com dados de demonstração.
+### Code of Conduct
+- [ ] **Code of Conduct**: I confirm that I will abide by the RBCS Code of Conduct.
 
-### 3. Funcionalidade & Testes
-- [ ] **Suíte de Testes**: O repositório contém testes automatizados (testes unitários e/ou testes de integração).
-- [ ] **Execução dos Testes**: Os testes puderam ser executados com sucesso pelo revisor e passaram sem falhas.
-- [ ] **Tratamento de Erros**: O software lida adequadamente com entradas inválidas e apresenta mensagens de erro informativas.
+### General Checks
+- [ ] **Repository**: The source code is publicly available in the stated GitHub repository.
+- [ ] **License**: The repository contains an OSI-approved open source license in a plain-text `LICENSE` file.
+- [ ] **Version**: The software has a clear version number or semantic release tag (e.g., `v1.0.0`).
+- [ ] **Authorship**: Authors listed in `paper.md` match the primary contributors in the repository.
 
-### 4. Manutenção e Boas Práticas
-- [ ] **Diretrizes de Contribuição**: O repositório possui diretrizes para colaboração (`CONTRIBUTING.md`) ou orientações claras para abertura de *issues* e *pull requests*.
-- [ ] **Código Limpo**: O código está organizado, legível e documentado com comentários ou docstrings.
+### Functionality & Tests
+- [ ] **Installation**: The software installs cleanly following the documented instructions in a fresh environment.
+- [ ] **Core Functionality**: The software executes its stated purpose without unexpected crashes or fatal errors.
+- [ ] **Performance Claims**: If the paper makes quantitative performance claims, they are reproducible.
+- [ ] **Automated Tests**: The repository includes automated tests (unit/integration) that run and pass successfully.
 
-### 5. Conteúdo do Artigo (`paper.md` e `paper.bib`)
-- [ ] **Declaração de Necessidade (*Statement of Need*)**: O artigo explica claramente por que o software foi desenvolvido e qual problema científico ele resolve.
-- [ ] **Público-Alvo**: O público acadêmico-científico beneficiado pela ferramenta está bem delineado.
-- [ ] **Estado da Arte**: O texto cita e compara brevemente o software com outras soluções existentes na literatura científica.
-- [ ] **Referências Bibliográficas**: O arquivo `paper.bib` contém referências completas, válidas e com DOIs/links quando disponíveis.
-- [ ] **Compilação**: O PDF gerado via Inara está livre de erros de formatação e os metadados (autores, afiliações, orcid) estão corretos.
+### Documentation
+- [ ] **Statement of Need**: The documentation and paper clearly state what scientific problem the software solves and who the target audience is.
+- [ ] **Installation Instructions**: Complete, step-by-step instructions with all dependencies and minimum versions specified.
+- [ ] **Example Usage**: A realistic quickstart tutorial with demo/sample data is provided.
+- [ ] **Functionality Documentation**: API reference or comprehensive user guide describing key functions.
+- [ ] **Community Guidelines**: Instructions for reporting bugs, requesting features, and contributing code (`CONTRIBUTING.md`).
 
----
-
-## 💬 Comentários e Parecer Geral do Revisor
-
-<!-- Descreva aqui seus comentários qualitativos, sugestões de melhoria ou pontos que necessitam de ajustes pelos autores -->
+### Software Paper (`paper.md` & `paper.bib`)
+- [ ] **Summary**: A concise, non-technical overview of the software.
+- [ ] **Statement of Need**: A clear section explaining the scientific context and research motivation.
+- [ ] **State of the Field**: Discussion and citation of existing alternatives, prior art, or competing tools.
+- [ ] **References**: Citations are properly formatted in `paper.bib` and all DOIs are valid.
 
 ---
 
-## ⚖️ Recomendação Editorial (Preenchido pelo Editor)
-- [ ] **Aprovado para Publicação**: Todos os itens foram atendidos e verificados.
-- [ ] **Revisão Requerida**: Aguardando respostas e ajustes dos autores nos itens apontados acima.
-- [ ] **Recusado / Fora de Escopo**: O software não atende aos critérios fundamentais de escopo ou qualidade.
+## 📋 Reviewer 2 Checklist (@reviewer2)
+
+### Conflict of Interest
+- [ ] **Conflict of Interest**: I confirm that I have no conflicts of interest with the authors of this submission.
+
+### Code of Conduct
+- [ ] **Code of Conduct**: I confirm that I will abide by the RBCS Code of Conduct.
+
+### General Checks
+- [ ] **Repository**: The source code is publicly available in the stated GitHub repository.
+- [ ] **License**: The repository contains an OSI-approved open source license in a plain-text `LICENSE` file.
+- [ ] **Version**: The software has a clear version number or semantic release tag (e.g., `v1.0.0`).
+- [ ] **Authorship**: Authors listed in `paper.md` match the primary contributors in the repository.
+
+### Functionality & Tests
+- [ ] **Installation**: The software installs cleanly following the documented instructions in a fresh environment.
+- [ ] **Core Functionality**: The software executes its stated purpose without unexpected crashes or fatal errors.
+- [ ] **Performance Claims**: If the paper makes quantitative performance claims, they are reproducible.
+- [ ] **Automated Tests**: The repository includes automated tests (unit/integration) that run and pass successfully.
+
+### Documentation
+- [ ] **Statement of Need**: The documentation and paper clearly state what scientific problem the software solves and who the target audience is.
+- [ ] **Installation Instructions**: Complete, step-by-step instructions with all dependencies and minimum versions specified.
+- [ ] **Example Usage**: A realistic quickstart tutorial with demo/sample data is provided.
+- [ ] **Functionality Documentation**: API reference or comprehensive user guide describing key functions.
+- [ ] **Community Guidelines**: Instructions for reporting bugs, requesting features, and contributing code (`CONTRIBUTING.md`).
+
+### Software Paper (`paper.md` & `paper.bib`)
+- [ ] **Summary**: A concise, non-technical overview of the software.
+- [ ] **Statement of Need**: A clear section explaining the scientific context and research motivation.
+- [ ] **State of the Field**: Discussion and citation of existing alternatives, prior art, or competing tools.
+- [ ] **References**: Citations are properly formatted in `paper.bib` and all DOIs are valid.
+
+---
+
+## 💬 Reviewer Comments & Discussion
+<!-- Reviewers and authors discuss comments, bugs, improvements, and paper edits below. -->
