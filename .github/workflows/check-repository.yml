@@ -1,0 +1,99 @@
+name: "Auditoria Automática do Repositório (JOSS Checks)"
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+jobs:
+  audit_repo:
+    name: Executar Auditoria de Submissão
+    if: |
+      (github.event_name == 'issues' && contains(github.event.issue.labels.*.name, 'pre-review')) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.state == 'open' &&
+       (contains(github.event.comment.body, 'check repository') ||
+        contains(github.event.comment.body, 'check submission') ||
+        contains(github.event.comment.body, '/check-repo') ||
+        contains(github.event.comment.body, '/check-repository') ||
+        contains(github.event.comment.body, '/audit')))
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout Repositório Editorial RBCS
+        uses: actions/checkout@v4
+
+      - name: Extrair URL do Repositório Submetido
+        id: parse_repo
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueBody = context.payload.issue.body || '';
+            const commentBody = (context.payload.comment && context.payload.comment.body) ? context.payload.comment.body : '';
+            
+            // Prioriza URL especificada no comando
+            const commentMatch = commentBody.match(/https:\/\/github\.com\/[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-\.]+/);
+            let targetUrl = commentMatch ? commentMatch[0] : '';
+            
+            if (!targetUrl) {
+              const bodyMatch = issueBody.match(/https:\/\/github\.com\/[a-zA-Z0-9_\-]+\/[a-zA-Z0-9_\-\.]+/);
+              if (bodyMatch) targetUrl = bodyMatch[0];
+            }
+            
+            if (!targetUrl) {
+              core.setFailed("Não foi possível identificar a URL do repositório no formulário ou no comentário.");
+              return;
+            }
+            
+            // Remove pontuação final se houver
+            targetUrl = targetUrl.replace(/\.+$/, '');
+            core.info(`Repositório a ser auditado: ${targetUrl}`);
+            core.setOutput('repo_url', targetUrl);
+
+      - name: Reagir ao Comentário com Ícone de Auditoria
+        if: github.event_name == 'issue_comment'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'eyes'
+            });
+
+      - name: Clonar Repositório do Autor
+        run: |
+          mkdir -p author_workspace
+          cd author_workspace
+          git clone "${{ steps.parse_repo.outputs.repo_url }}" .
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Executar Script de Auditoria
+        id: run_audit
+        run: |
+          chmod +x scripts/audit_submission.py
+          python3 scripts/audit_submission.py author_workspace "${{ steps.parse_repo.outputs.repo_url }}" > audit_report.md
+          cat audit_report.md
+
+      - name: Publicar Relatório de Auditoria no Issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const reportContent = fs.readFileSync('audit_report.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: reportContent
+            });
