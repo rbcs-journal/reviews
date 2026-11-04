@@ -1,0 +1,30 @@
+name: "Boas-vindas a Nova Submissão"
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  welcome:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Postar Boas-vindas e Instruções Iniciais
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const author = context.payload.issue.user.login;
+            const message = `👋 Olá @${author}, obrigado por submeter seu software à **Revista Brasileira de Computação e Software Científico (RBCS)**!\n\n` +
+              `### 🚦 Próximos Passos (Fase de Pre-Review):\n` +
+              `1. **Triagem de Escopo**: O Editor-Chefe irá verificar o escopo e designar um Editor de Trilha especializado.\n` +
+              `2. **Recrutamento de Revisores**: O editor convidará dois revisores com expertise na sua área.\n` +
+              `3. **Início da Revisão**: Quando os revisores aceitarem, o checklist oficial de avaliação será ativado.\n\n` +
+              `💡 **Dica**: Você pode testar a compilação do seu \`paper.md\` a qualquer momento digitando o comando \`/compile-pdf\` neste issue!`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });

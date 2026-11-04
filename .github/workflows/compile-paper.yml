@@ -1,0 +1,132 @@
+name: "Compilar Artigo (Inara PDF Engine)"
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  compile:
+    name: Compilar Artigo RBCS
+    if: |
+      github.event.issue.state == 'open' &&
+      (contains(github.event.comment.body, '/compile-pdf') ||
+       contains(github.event.comment.body, '/generate-pdf') ||
+       contains(github.event.comment.body, '/preview'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repositório de Reviews
+        uses: actions/checkout@v4
+
+      - name: Extrair Informações do Repositório Submetido
+        id: parse_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issueBody = context.payload.issue.body || '';
+            const commentBody = context.payload.comment.body || '';
+            
+            // Tenta pegar a URL explicitamente do comentário (ex: /compile-pdf https://github.com/user/repo)
+            const commentMatch = commentBody.match(/https:\/\/github\.com\/[^\s\)]+/);
+            let repoUrl = commentMatch ? commentMatch[0] : '';
+            
+            if (!repoUrl) {
+              // Tenta extrair do formulário da issue
+              const bodyMatch = issueBody.match(/https:\/\/github\.com\/[^\s\)]+/);
+              if (bodyMatch) repoUrl = bodyMatch[0];
+            }
+            
+            if (!repoUrl) {
+              core.setFailed("Não foi possível identificar a URL do repositório no issue ou no comando.");
+              return;
+            }
+            
+            core.info(`Repositório identificado: ${repoUrl}`);
+            core.setOutput('repo_url', repoUrl);
+
+      - name: Notificar Início de Compilação
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.reactions.createForIssueComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: context.payload.comment.id,
+              content: 'rocket'
+            });
+
+      - name: Clonar Repositório do Autor
+        run: |
+          mkdir -p workspace_paper
+          cd workspace_paper
+          git clone "${{ steps.parse_info.outputs.repo_url }}" .
+          
+          # Procura por paper.md na raiz ou em paper/
+          if [ -f "paper.md" ]; then
+            echo "PAPER_DIR=." >> $GITHUB_ENV
+            echo "PAPER_FILE=paper.md" >> $GITHUB_ENV
+          elif [ -f "paper/paper.md" ]; then
+            echo "PAPER_DIR=paper" >> $GITHUB_ENV
+            echo "PAPER_FILE=paper/paper.md" >> $GITHUB_ENV
+          else
+            echo "ERRO: paper.md não encontrado no repositório do autor!"
+            exit 1
+          fi
+
+      - name: Compilar Artigo com Inara (Docker)
+        run: |
+          cd workspace_paper/${{ env.PAPER_DIR }}
+          docker run --rm \
+            --volume "$PWD:/data" \
+            --user "$(id -u):$(id -g)" \
+            openjournals/inara:latest \
+            -o "pdf,jats,crossref" paper.md
+          
+          # Renomeia para facilitar identificação
+          mv paper.pdf rbcs_preview_paper_${{ github.event.issue.number }}.pdf || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rbcs-paper-preview-issue-${{ github.event.issue.number }}
+          path: workspace_paper/${{ env.PAPER_DIR }}/*.pdf
+
+      - name: Publicar Comentário com Resultado
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const message = `✅ **Artigo compilado com sucesso via Inara!**\n\n` +
+              `- **Prévia em PDF**: O artefato está disponível para download na execução da [GitHub Action #${context.runId}](${runUrl}).\n` +
+              `- **Repositório avaliado**: ${{ steps.parse_info.outputs.repo_url }}\n\n` +
+              `*Editores e revisores podem baixar o PDF nos artefatos da Action para validação visual do layout.*`;
+              
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
+
+      - name: Notificar Erro de Compilação
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const message = `❌ **Falha na compilação do artigo!**\n\n` +
+              `Não foi possível gerar o PDF a partir de \`paper.md\`.\n` +
+              `- Verifique se o arquivo \`paper.md\` e \`paper.bib\` existem e possuem sintaxe válida.\n` +
+              `- Consulte o log detalhado de execução em [GitHub Action #${context.runId}](${runUrl}).`;
+              
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });

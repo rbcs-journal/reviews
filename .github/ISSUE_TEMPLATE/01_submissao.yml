@@ -1,0 +1,92 @@
+name: 📝 Nova Submissão de Software (Submission)
+description: Submeta seu software de código aberto e artigo para revisão por pares na RBCS.
+title: "[Submissão]: "
+labels: ["pre-review", "needs-editor"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por submeter seu software à **Revista Brasileira de Computação e Software Científico (RBCS)**!
+        Por favor, preencha os campos abaixo com atenção. Antes de prosseguir, confirme que o seu repositório contém:
+        1. Código-fonte completo com licença de código aberto (aprovada pela OSI).
+        2. Arquivo `paper.md` e `paper.bib` na raiz ou no diretório `paper/`.
+        3. Instruções claras de instalação e suíte de testes funcionais.
+
+  - type: input
+    id: title
+    attributes:
+      label: Título do Artigo / Software
+      placeholder: "Ex: PyBioPipeline: Um pacote Python para análise genômica comparativa"
+    validations:
+      required: true
+
+  - type: input
+    id: repository
+    attributes:
+      label: URL do Repositório no GitHub
+      placeholder: "https://github.com/usuario/repositorio"
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Versão / Tag do Software Submetido
+      placeholder: "Ex: v1.0.0 ou commit SHA"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: track
+    attributes:
+      label: Trilha Editorial Principal
+      description: Selecione a área mais adequada para a designação do editor especializado.
+      options:
+        - "🧬 Bioinformática & Biologia Computacional (Genômica, Transcriptômica, Ômicas)"
+        - "🏥 Computação Biomédica & Informática em Saúde (Imagens Médicas, Sinais, EHR)"
+        - "🤖 Inteligência Artificial & Ciência de Dados em Saúde e Ciência"
+        - "💻 Computação Científica Geral, Métodos Numéricos & Algoritmos"
+    validations:
+      required: true
+
+  - type: input
+    id: authors
+    attributes:
+      label: Autores e Afiliações
+      description: Liste autores com GitHub handles (se aplicável) e links ORCID.
+      placeholder: "Nome do Autor (@github_handle, ORCID: 0000-0000-0000-0000, Universidade XYZ)"
+    validations:
+      required: true
+
+  - type: input
+    id: license
+    attributes:
+      label: Licença de Código Aberto (OSI-approved)
+      placeholder: "Ex: MIT, Apache-2.0, GPL-3.0, BSD-3-Clause"
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Resumo Curto e Declaração de Necessidade (Statement of Need)
+      description: Breve parágrafo explicando o propósito do software e o público científico que ele atende.
+      placeholder: "PyBioPipeline é uma ferramenta desenvolvida para acelerar a identificação de variantes..."
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Declarações e Compromissos
+      options:
+        - label: "Confirmo que sou um dos autores ou mantenedores principais do software."
+          required: true
+        - label: "O repositório é público no GitHub e possui uma licença OSI explícita no arquivo LICENSE."
+          required: true
+        - label: "O repositório contém os arquivos paper.md e paper.bib prontos para compilação."
+          required: true
+        - label: "O software possui documentação de instalação e testes que podem ser executados pelos revisores."
+          required: true
+        - label: "Concordo com o modelo de revisão por pares aberta e pública nos issues do GitHub sob licença CC-BY 4.0."
+          required: true
