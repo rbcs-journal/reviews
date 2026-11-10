@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: rbcs-paper-preview-issue-${{ github.event.issue.number }}
-          path: workspace_paper/${{ env.PAPER_DIR }}/*.pdf
+          path: workspace_paper/**/*.pdf
 
       - name: Publicar Comentário com Resultado
         if: success()
